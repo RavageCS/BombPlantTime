@@ -4,6 +4,18 @@
 
 #pragma semicolon 1
 
+int g_num_ticks_start_pre;
+int g_num_ticks_finish_pre;
+
+int g_num_ticks_start_post;
+int g_num_ticks_finish_post;
+
+float g_ticked_time_start_pre;
+float g_ticked_time_finish_pre;
+
+float g_ticked_time_start_post;
+float g_ticked_time_finish_post;
+
 float g_engine_time_start_pre;
 float g_engine_time_finish_pre;
 
@@ -14,7 +26,7 @@ bool g_attack1;
 bool g_use;
 
 // Plugin definitions
-#define PLUGIN_VERSION "1.0"
+#define PLUGIN_VERSION "1.1.0"
 public Plugin:myinfo =
 {
 	name = "Bomb Plant Time Tester",
@@ -41,6 +53,18 @@ public OnPluginStart()
 
 public void reset_globals()
 {
+	g_num_ticks_start_pre = 0;
+	g_num_ticks_finish_pre = 0;
+
+	g_num_ticks_start_post = 0;
+	g_num_ticks_finish_post = 0;
+
+	g_ticked_time_start_pre = 0.0;
+	g_ticked_time_finish_pre = 0.0;
+
+	g_ticked_time_start_post = 0.0;
+	g_ticked_time_finish_post = 0.0;
+
 	g_engine_time_start_pre = 0.0;
 	g_engine_time_finish_pre = 0.0;
 
@@ -79,8 +103,9 @@ public Set_vars(Handle:event, const String:name[], bool:dontBroadcast)
 public Event_Pre_BombPlantStart(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
+	g_num_ticks_start_pre = GetGameTickCount();
+	g_ticked_time_start_pre = GetTickedTime();
 	g_engine_time_start_pre = GetEngineTime();
-
 	GetKeys(client);
 }
 
@@ -91,8 +116,9 @@ public Event_Pre_BombPlantStop(Handle:event, const String:name[], bool:dontBroad
 
 public Event_Pre_BombPlantFinish(Handle:event, const String:name[], bool:dontBroadcast)
 {
+	g_num_ticks_finish_pre = GetGameTickCount();
+	g_ticked_time_finish_pre = GetTickedTime();
 	g_engine_time_finish_pre = GetEngineTime();
-
 	PrintToChatAll("Bomb Planted!!");
 	
 	if(g_attack1)
@@ -102,17 +128,25 @@ public Event_Pre_BombPlantFinish(Handle:event, const String:name[], bool:dontBro
 	else
 		PrintToChatAll("Error decting key press");
 
-	PrintToChatAll("Time to plant pre hook: %f", g_engine_time_finish_pre - g_engine_time_start_pre);
+	PrintToChatAll("Number of ticks to plant bomb pre hook: %i", g_num_ticks_finish_pre - g_num_ticks_start_pre);
+	PrintToChatAll("Ticked time to plant post hook: %f", g_ticked_time_finish_pre - g_ticked_time_start_pre);
+	PrintToChatAll("Engine time to plant pre hook: %f", g_engine_time_finish_pre - g_engine_time_start_pre);
 }
 
 //Post hook calls
 public Event_Post_BombPlantStart(Handle:event, const String:name[], bool:dontBroadcast)
 {
+	g_num_ticks_start_post = GetGameTickCount();
+	g_ticked_time_start_post = GetTickedTime();
 	g_engine_time_start_post = GetEngineTime();
 }
 
 public Event_Post_BombPlantFinish(Handle:event, const String:name[], bool:dontBroadcast)
 {
+	g_num_ticks_finish_post = GetGameTickCount();
+	g_ticked_time_finish_post = GetTickedTime();
 	g_engine_time_finish_post = GetEngineTime();
-	PrintToChatAll("Time to plant post hook: %f", g_engine_time_finish_post - g_engine_time_start_post);
+	PrintToChatAll("Number of ticks to plant bomb post hook: %i", g_num_ticks_finish_post - g_num_ticks_start_post);
+	PrintToChatAll("Ticked time to plant post hook: %f", g_ticked_time_finish_post - g_ticked_time_start_post);
+	PrintToChatAll("Engine time to plant post hook: %f", g_engine_time_finish_post - g_engine_time_start_post);
 }
