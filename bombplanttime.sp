@@ -26,7 +26,7 @@ bool g_attack1;
 bool g_use;
 
 // Plugin definitions
-#define PLUGIN_VERSION "1.1.0"
+#define PLUGIN_VERSION "1.1.1"
 public Plugin:myinfo =
 {
 	name = "Bomb Plant Time Tester",
@@ -38,8 +38,8 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
-	HookEvent("round_start", Set_vars);
-	HookEvent("bomb_exploded", Set_vars);
+	HookEvent("round_start", SetVars);
+	HookEvent("bomb_exploded", SetVars);
 
 	// Pre hook events
 	HookEvent("bomb_beginplant", Event_Pre_BombPlantStart, EventHookMode_Pre);
@@ -51,7 +51,7 @@ public OnPluginStart()
 	HookEvent("bomb_planted", Event_Post_BombPlantFinish, EventHookMode_Post);
 }
 
-public void reset_globals()
+public void ResetGlobals()
 {
 	g_num_ticks_start_pre = 0;
 	g_num_ticks_finish_pre = 0;
@@ -91,12 +91,12 @@ public void GetKeys(int client)
 
 public void OnMapStart()
 {
-	reset_globals();
+	ResetGlobals();
 }
 
-public Set_vars(Handle:event, const String:name[], bool:dontBroadcast)
+public SetVars(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	reset_globals();
+	ResetGlobals();
 }
 
 //Pre hook calls
@@ -111,7 +111,7 @@ public Event_Pre_BombPlantStart(Handle:event, const String:name[], bool:dontBroa
 
 public Event_Pre_BombPlantStop(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	reset_globals();
+	ResetGlobals();
 }
 
 public Event_Pre_BombPlantFinish(Handle:event, const String:name[], bool:dontBroadcast)
@@ -119,6 +119,7 @@ public Event_Pre_BombPlantFinish(Handle:event, const String:name[], bool:dontBro
 	g_num_ticks_finish_pre = GetGameTickCount();
 	g_ticked_time_finish_pre = GetTickedTime();
 	g_engine_time_finish_pre = GetEngineTime();
+
 	PrintToChatAll("Bomb Planted!!");
 	
 	if(g_attack1)
@@ -126,10 +127,10 @@ public Event_Pre_BombPlantFinish(Handle:event, const String:name[], bool:dontBro
 	else if(g_use)
 		PrintToChatAll("Method: +use");
 	else
-		PrintToChatAll("Error decting key press");
+		PrintToChatAll("Error detecting key press");
 
 	PrintToChatAll("Number of ticks to plant bomb pre hook: %i", g_num_ticks_finish_pre - g_num_ticks_start_pre);
-	PrintToChatAll("Ticked time to plant post hook: %f", g_ticked_time_finish_pre - g_ticked_time_start_pre);
+	PrintToChatAll("Ticked time to plant pre hook: %f", g_ticked_time_finish_pre - g_ticked_time_start_pre);
 	PrintToChatAll("Engine time to plant pre hook: %f", g_engine_time_finish_pre - g_engine_time_start_pre);
 }
 
